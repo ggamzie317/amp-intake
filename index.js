@@ -86,6 +86,11 @@ const PATTERNS = [
     id: 'P02_POINTS_EXPIRING_SOON',
     when: { primaryGoal: 'cash_finance', scenario: 'points_expiring_soon' },
     modules: ['M02_POINTS_EXPIRY_ALERT']
+  },
+  {
+    id: 'P03_BEFORE_CARD_CANCELLATION',
+    when: { primaryGoal: 'cash_finance', scenario: 'before_card_cancellation' },
+    modules: ['M03_CARD_CANCELLATION_CHECKLIST']
   }
 ];
 
