@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "title": "AMP Intake v1",
+  "type": "object",
+  "required": ["meta", "routing", "domain", "policy"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["caseId", "createdAt", "locale", "currency", "source"],
+      "additionalProperties": true,
+      "properties": {
+        "caseId": { "type": "string" },
+        "portfolioId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "locale": { "type": "string" },
+        "currency": { "type": "string" },
+        "source": {
+          "type": "string",
+          "enum": ["web", "manual", "partner"]
+        }
+      }
+    },
+
+    "routing": {
+      "type": "object",
+      "required": ["primaryGoal", "scenario", "urgency"],
+      "additionalProperties": false,
+      "properties": {
+        "primaryGoal": {
+          "type": "string",
+          "enum": [
+            "portfolio",
+            "travel_air",
+            "travel_hotel",
+            "cash_finance",
+            "status_tier",
+            "compliance"
+          ]
+        },
+        "scenario": { "type": "string" },
+        "urgency": {
+          "type": "string",
+          "enum": ["normal", "urgent"]
+        }
+      }
+    },
+
+    "domain": {
+      "type": "object",
+      "required": ["programs", "balances", "pricing"],
+      "additionalProperties": true,
+      "properties": {
+        "programs": {
+          "type": "object",
+          "required": ["sourceProgram"],
+          "additionalProperties": true,
+          "properties": {
+            "entries": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "sourceProgram": { "type": "string" },
+            "targetProgram": { "type": "string" }
+          }
+        },
+        "balances": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "pointBalance": {
+              "type": ["number", "null"],
+              "minimum": 0
+            },
+            "mileBalance": {
+              "type": ["number", "null"],
+              "minimum": 0
+            }
+          }
+        },
+        "trip": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": ["air", "hotel", "none"]
+            },
+            "origin": { "type": "string" },
+            "destination": { "type": "string" },
+            "departDate": { "type": "string", "format": "date" },
+            "returnDate": { "type": "string", "format": "date" },
+            "travelers": { "type": "integer", "minimum": 1 }
+          }
+        },
+        "pricing": {
+          "type": "object",
+          "required": ["transferRatio"],
+          "additionalProperties": true,
+          "properties": {
+            "cashPrice": {
+              "type": ["number", "null"],
+              "minimum": 0
+            },
+            "transferRatio": { "type": "number", "exclusiveMinimum": 0 },
+            "transferBonusPercent": {
+              "type": "number",
+              "minimum": 0
+            }
+          }
+        },
+        "preferences": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "optimizeFor": {
+              "type": "string",
+              "enum": ["value", "comfort", "status", "flexibility"]
+            },
+            "cabin": {
+              "type": "string",
+              "enum": ["economy", "business", "first"]
+            },
+            "brandBias": {
+              "type": "array",
+              "items": { "type": "string" }
+            }
+          }
+        },
+        "user": {
+          "type": "object",
+          "additionalProperties": true,
+          "properties": {
+            "statusLevel": {
+              "type": "string",
+              "enum": ["gold", "platinum", "none"]
+            }
+          }
+        }
+      }
+    },
+
+    "policy": {
+      "type": "object",
+      "required": ["complianceFlags"],
+      "additionalProperties": true,
+      "properties": {
+        "complianceFlags": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "isPublicOfficial": { "type": "boolean" },
+            "isMilitary": { "type": "boolean" },
+            "isCorporateTrip": { "type": "boolean" },
+            "usesCorporateCard": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,169 @@
+openapi: 3.0.3
+info:
+  title: AMP Intake API
+  version: 1.0.0
+
+paths:
+  /ampIntake:
+    post:
+      summary: AMP intake and routing
+      operationId: ampIntake
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AmpIntakeRequest"
+      responses:
+        "200":
+          description: Intake accepted and routed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AmpIntakeSuccessResponse"
+        "400":
+          description: Invalid intake payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AmpIntakeErrorResponse"
+        "405":
+          description: Method not allowed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AmpIntakeErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AmpIntakeErrorResponse"
+
+components:
+  schemas:
+    AmpIntakeRequest:
+      type: object
+      required:
+        - routing
+      properties:
+        routing:
+          type: object
+          required:
+            - primaryGoal
+            - scenario
+          properties:
+            primaryGoal:
+              type: string
+              description: High-level goal for routing
+              enum:
+                - cash_finance
+                - travel_air
+                - travel_hotel
+                - portfolio
+                - compliance
+            scenario:
+              type: string
+              description: Scenario for routing
+              enum:
+                - cashout_vs_transfer
+                - points_expiring_soon
+                - before_card_cancellation
+                - points_cash_mix
+                - annual_fee_value_check
+                - economy_vs_business
+                - upgrade_vs_full_redemption
+                - peak_vs_offpeak
+                - direct_vs_connecting
+                - partner_airline_use
+                - free_night_vs_upgrade
+                - breakfast_lounge_value
+                - peak_season_free_stay
+                - points_cash_vs_full_points
+                - elite_status_use
+                - card_to_airline_transfer
+                - flight_hotel_combo
+                - family_pooling
+                - business_personal_trip
+                - business_conf_summary
+                - mileage_portfolio
+                - short_long_haul_mix
+                - hotel_chain_mix
+                - large_balance_cleanup
+                - rule_change
+                - multi_points_parallel
+                - air_hotel_split
+                - card_ab_mix
+                - buy_points_vs_pay_cash
+                - mileage_purchase_threshold
+                - cash_topup_strategy
+                - promo_timing_purchase
+                - public_official_travel
+                - corporate_personal
+                - corporate_card_ownership
+                - role_based_benefit_gap
+                - targeted_promo
+                - promo_stacking
+                - double_dipping
+                - promo_vs_standard
+                - family_transfer
+                - transfer_fee_value
+                - gift_inheritance
+                - account_merge
+                - corp_code_vs_promo
+                - corp_code_earn
+                - corp_code_redeem
+                - corp_code_elite
+                - corp_code_stacking
+                - compliance_risk
+            urgency:
+              type: string
+              enum:
+                - low
+                - normal
+                - urgent
+        meta:
+          type: object
+          properties:
+            caseId:
+              type: string
+              description: Optional client-provided case ID
+
+    AmpIntakeSuccessResponse:
+      type: object
+      required:
+        - success
+        - caseId
+        - activePatterns
+        - executeModules
+      properties:
+        success:
+          type: boolean
+          example: true
+        caseId:
+          type: string
+        activePatterns:
+          type: array
+          items:
+            type: string
+            example: P01_CASH_OUT_VS_TRANSFER
+        executeModules:
+          type: array
+          items:
+            type: string
+            example: M01_CASH_OUT_VS_TRANSFER_ANALYSIS
+        message:
+          type: string
+
+    AmpIntakeErrorResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+        error:
+          type: string
