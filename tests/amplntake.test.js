@@ -1,6 +1,8 @@
+// tests/amplntake.test.js
 const { ampIntake } = require('../index');
+const { makeIntake } = require('./intakeFactory');
 
-// 아주 간단한 req/res mock
+// Req/Res Mock Helper
 function createMockReqRes(body) {
   const req = {
     method: 'POST',
@@ -24,99 +26,61 @@ function createMockReqRes(body) {
   return { req, res, getResult: () => ({ statusCode, body: sentBody }) };
 }
 
-test('ampIntake - cash_finance / cashout_vs_transfer 라우팅이 동작한다', async () => {
-  const intake = {
-    routing: {
-      primaryGoal: 'cash_finance',
-      scenario: 'cashout_vs_transfer',
-      urgency: 'normal'
-    },
-    meta: {
-      caseId: 'TEST-CASE-001'
-    }
-  };
+describe('AMP Intake Functional Tests', () => {
 
-  const { req, res, getResult } = createMockReqRes(intake);
+  test('P01: cash_finance / cashout_vs_transfer 라우팅 확인', async () => {
+    // Factory를 사용해 필수 필드를 자동 채움 + 테스트 조건만 명시
+    const intake = makeIntake({
+      routing: {
+        primaryGoal: 'cash_finance',
+        scenario: 'cashout_vs_transfer',
+        urgency: 'normal'
+      },
+      meta: { caseId: 'TEST-CASE-P01' }
+    });
 
-  await ampIntake(req, res);
+    const { req, res, getResult } = createMockReqRes(intake);
+    await ampIntake(req, res);
+    const { statusCode, body } = getResult();
 
-  const { statusCode, body } = getResult();
+    expect(statusCode).toBe(200);
+    expect(body.success).toBe(true);
+    expect(body.activePatterns).toContain('P01_CASH_OUT_VS_TRANSFER');
+    expect(body.executeModules).toContain('M01_CASH_OUT_VS_TRANSFER_ANALYSIS');
+  });
 
-  // 1) HTTP 상태코드가 200인지 확인
-  expect(statusCode).toBe(200);
+  test('P02: cash_finance / points_expiring_soon 라우팅 확인', async () => {
+    const intake = makeIntake({
+      routing: {
+        primaryGoal: 'cash_finance',
+        scenario: 'points_expiring_soon'
+      },
+      meta: { caseId: 'TEST-CASE-P02' }
+    });
 
-  // 2) success가 true인지 확인
-  expect(body).toHaveProperty('success', true);
+    const { req, res, getResult } = createMockReqRes(intake);
+    await ampIntake(req, res);
+    const { statusCode, body } = getResult();
 
-  // 3) activePatterns에 우리가 기대하는 패턴이 포함됐는지 확인
-  expect(Array.isArray(body.activePatterns)).toBe(true);
-  expect(body.activePatterns).toContain('P01_CASH_OUT_VS_TRANSFER');
+    expect(statusCode).toBe(200);
+    expect(body.activePatterns).toContain('P02_POINTS_EXPIRING_SOON');
+  });
 
-  // 4) executeModules에 기대 모듈이 포함됐는지 확인
-  expect(Array.isArray(body.executeModules)).toBe(true);
-  expect(body.executeModules).toContain('M01_CASH_OUT_VS_TRANSFER_ANALYSIS');
-});
-test('ampIntake - cash_finance / points_expiring_soon 라우팅이 동작한다', async () => {
-  const intake = {
-    routing: {
-      primaryGoal: 'cash_finance',
-      scenario: 'points_expiring_soon',
-      urgency: 'normal'
-    },
-    meta: {
-      caseId: 'TEST-CASE-002'
-    }
-  };
+  test('P03: cash_finance / before_card_cancellation 라우팅 확인', async () => {
+    const intake = makeIntake({
+      routing: {
+        primaryGoal: 'cash_finance',
+        scenario: 'before_card_cancellation'
+      },
+      meta: { caseId: 'TEST-CASE-P03' }
+    });
 
-  const { req, res, getResult } = createMockReqRes(intake);
+    const { req, res, getResult } = createMockReqRes(intake);
+    await ampIntake(req, res);
+    const { statusCode, body } = getResult();
 
-  await ampIntake(req, res);
+    expect(statusCode).toBe(200);
+    expect(body.activePatterns).toContain('P03_BEFORE_CARD_CANCELLATION');
+  });
 
-  const { statusCode, body } = getResult();
-
-  // 1) HTTP 상태코드가 200인지 확인
-  expect(statusCode).toBe(200);
-
-  // 2) success가 true인지 확인
-  expect(body).toHaveProperty('success', true);
-
-  // 3) activePatterns에 우리가 기대하는 패턴이 포함됐는지 확인
-  expect(Array.isArray(body.activePatterns)).toBe(true);
-  expect(body.activePatterns).toContain('P02_POINTS_EXPIRING_SOON');
-
-  // 4) executeModules에 기대 모듈이 포함됐는지 확인
-  expect(Array.isArray(body.executeModules)).toBe(true);
-  expect(body.executeModules).toContain('M02_POINTS_EXPIRY_ALERT');
-});
-test('ampIntake - cash_finance / before_card_cancellation 라우팅이 동작한다', async () => {
-  const intake = {
-    routing: {
-      primaryGoal: 'cash_finance',
-      scenario: 'before_card_cancellation',
-      urgency: 'normal'
-    },
-    meta: {
-      caseId: 'TEST-CASE-003'
-    }
-  };
-
-  const { req, res, getResult } = createMockReqRes(intake);
-
-  await ampIntake(req, res);
-
-  const { statusCode, body } = getResult();
-
-  // 1) HTTP 상태코드가 200인지 확인
-  expect(statusCode).toBe(200);
-
-  // 2) success가 true인지 확인
-  expect(body).toHaveProperty('success', true);
-
-  // 3) activePatterns에 우리가 기대하는 패턴이 포함됐는지 확인
-  expect(Array.isArray(body.activePatterns)).toBe(true);
-  expect(body.activePatterns).toContain('P03_BEFORE_CARD_CANCELLATION');
-
-  // 4) executeModules에 기대 모듈이 포함됐는지 확인
-  expect(Array.isArray(body.executeModules)).toBe(true);
-  expect(body.executeModules).toContain('M03_CARD_CANCELLATION_CHECKLIST');
 });

@@ -1,0 +1,694 @@
+// index.js
+// AMP Intake 최소 동작 버전 (Node.js 22, Cloud Functions Framework)
+// AMP Intake 최소 동작 버전 (Node.js 22, Cloud Functions Framework)
+// index.js
+// AMP Intake 최소 동작 버전 (Node.js 22, Cloud Functions Framework)
+
+process.on('uncaughtException', (e) =>
+  console.error('[UNCAUGHT]', e && e.message, e && e.stack)
+);
+process.on('unhandledRejection', (e) =>
+  console.error('[REJECTION]', e && e.message, e && e.stack)
+);
+
+const Ajv = (require('ajv').default || require('ajv'));
+
+
+const intakeSchema = require('./amp-intake-v1.schema.json');
+console.log('[AJV] intakeSchema.$schema =', intakeSchema && intakeSchema.$schema);
+console.log('[AJV] cwd =', process.cwd());
+
+const ajv = new Ajv({
+  allErrors: true,
+  strictSchema: false,
+  strictTypes: false
+});
+
+let validateIntake;
+try {
+  validateIntake = ajv.compile(intakeSchema);
+  process.stderr.write('[AJV] compile OK\n');
+} catch (e) {
+
+  // Cloud Run에서 console.error가 잘리거나 flush 전에 죽는 경우가 있어서,
+  // stderr에 "동기"로 바로 써버립니다.
+  const msg = e && e.message ? e.message : String(e);
+  const stack = e && e.stack ? e.stack : '(no stack)';
+  const props = e ? Object.getOwnPropertyNames(e) : [];
+
+  process.stderr.write('[AJV] compile FAIL message: ' + msg + '\n');
+  process.stderr.write('[AJV] compile FAIL props: ' + JSON.stringify(props) + '\n');
+
+  // Ajv 에러 배열이 있으면 그것도 강제로 출력
+  try {
+    process.stderr.write('[AJV] compile FAIL errors: ' + JSON.stringify(e.errors, null, 2) + '\n');
+  } catch (_) {
+    process.stderr.write('[AJV] compile FAIL errors: (unserializable)\n');
+  }
+
+  process.stderr.write('[AJV] compile FAIL stack:\n' + stack + '\n');
+
+  validateIntake = null;
+
+  // 여기서 종료시키면 로그가 더 확실히 남습니다 (디버깅 끝나면 제거)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+const functions = require('@google-cloud/functions-framework');
+// 나중에 진짜 패턴 로직을 넣을 자리
+function resolveAMPPlan(intake, caseId) {
+  const activePatterns = [];
+  const executeModules = [];
+
+  if (intake && intake.primaryGoal === 'leads') {
+    activePatterns.push('P01_LEAD_GEN');
+    executeModules.push('M01_LANDING_PAGE');
+  }
+
+  if (
+    intake &&
+    intake.primaryGoal === 'leads' &&
+    intake.channel === 'social'
+  ) {
+    activePatterns.push('P20_SOCIAL_LEAD_FLOW');
+    executeModules.push('M20_SOCIAL_ADS_FUNNEL');
+  }
+
+  if (intake && intake.primaryGoal === 'sales') {
+    activePatterns.push('P02_SALES_FUNNEL');
+    executeModules.push('M02_CHECKOUT_OPTIMIZATION');
+  }
+
+  if (
+    intake &&
+    intake.primaryGoal === 'sales' &&
+    intake.budget === 'high'
+  ) {
+    activePatterns.push('P10_HIGH_TOUCH_SALES');
+    executeModules.push('M10_PREMIUM_FUNNEL');
+  }
+
+  if (intake && intake.primaryGoal === 'awareness') {
+    activePatterns.push('P03_BRAND_AWARENESS');
+    executeModules.push('M03_CONTENT_CAMPAIGN');
+  }
+  // P01 Cash-out vs Transfer
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'cashout_vs_transfer'
+  ) {
+    activePatterns.push('P01_CASH_OUT_VS_TRANSFER');
+    // 임시로 모듈 하나만 붙여둠 (나중에 실제 이름으로 교체 가능)
+    executeModules.push('M01_CASH_OUT_VS_TRANSFER_ANALYSIS');
+  }
+  // P02 Points Expiring Soon
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'points_expiring_soon'
+  ) {
+    activePatterns.push('P02_POINTS_EXPIRING_SOON');
+    executeModules.push('M02_POINTS_EXPIRY_ALERT');
+  }
+  // P03 Before Card Cancellation
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'before_card_cancellation'
+  ) {
+    activePatterns.push('P03_BEFORE_CARD_CANCELLATION');
+    executeModules.push('M03_CARD_CANCELLATION_CHECKLIST');
+  }
+  // P04 Points Cash Mix
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'points_cash_mix'
+  ) {
+    activePatterns.push('P04_POINTS_CASH_MIX');
+    executeModules.push('M04_POINTS_CASH_MIX_OPTIMIZER');
+  }
+  // P05 Annual Fee Value Check
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'annual_fee_value_check'
+  ) {
+    activePatterns.push('P05_ANNUAL_FEE_VALUE_CHECK');
+    executeModules.push('M05_ANNUAL_FEE_VALUE_REPORT');
+  }
+  // P06 Economy vs Business
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.scenario === 'economy_vs_business'
+  ) {
+    activePatterns.push('P06_ECONOMY_VS_BUSINESS');
+    executeModules.push('M06_ECONOMY_BUSINESS_COMPARISON');
+  }
+  // P07 Upgrade vs Full Redemption
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.scenario === 'upgrade_vs_full_redemption'
+  ) {
+    activePatterns.push('P07_UPGRADE_VS_FULL_REDEMPTION');
+    executeModules.push('M07_UPGRADE_VS_FULL_REDEEM_ANALYZER');
+  }
+  // P08 Peak vs Off-Peak Timing
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.scenario === 'peak_vs_offpeak'
+  ) {
+    activePatterns.push('P08_PEAK_VS_OFFPEAK_TIMING');
+    executeModules.push('M08_PEAK_OFFPEAK_TIMING_ANALYZER');
+  }
+  // P09 Direct vs Connecting
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.scenario === 'direct_vs_connecting'
+  ) {
+    activePatterns.push('P09_DIRECT_VS_CONNECTING');
+    executeModules.push('M09_DIRECT_CONNECTING_ROUTE_ANALYZER');
+  }
+  // P10 Partner Airline Use
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.scenario === 'partner_airline_use'
+  ) {
+    activePatterns.push('P10_PARTNER_AIRLINE_USE');
+    executeModules.push('M10_PARTNER_AIRLINE_OPTIMIZER');
+  }
+  // P11 Free Night vs Upgrade
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_hotel' &&
+    intake.scenario === 'free_night_vs_upgrade'
+  ) {
+    activePatterns.push('P11_FREE_NIGHT_VS_UPGRADE');
+    executeModules.push('M11_FREE_NIGHT_UPGRADE_ANALYZER');
+  }
+  // P12 Breakfast/Lounge Value
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_hotel' &&
+    intake.scenario === 'breakfast_lounge_value'
+  ) {
+    activePatterns.push('P12_BREAKFAST_LOUNGE_VALUE');
+    executeModules.push('M12_BREAKFAST_LOUNGE_VALUE_ANALYZER');
+  }
+  // P13 Peak Season Free Stay
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_hotel' &&
+    intake.scenario === 'peak_season_free_stay'
+  ) {
+    activePatterns.push('P13_PEAK_SEASON_FREE_STAY');
+    executeModules.push('M13_PEAK_SEASON_FREE_STAY_ANALYZER');
+  }
+  // P14 PointsCash vs Full Points
+  if (
+    intake &&
+    intake.primaryGoal === 'cashFinance' &&
+    intake.scenario === 'points_cash_vs_full_points'
+  ) {
+    activePatterns.push('P14_POINTS_CASH_VS_FULL_POINTS');
+    executeModules.push('M14_POINTS_CASH_FULL_COMPARISON');
+  }
+  // P15 Elite Status Use
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_hotel' &&
+    intake.scenario === 'elite_status_use'
+  ) {
+    activePatterns.push('P15_ELITE_STATUS_USE');
+    executeModules.push('M15_ELITE_STATUS_OPTIMIZER');
+  }
+  // P16 Card to Airline Transfer
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'card_to_airline_transfer'
+  ) {
+    activePatterns.push('P16_CARD_TO_AIRLINE_TRANSFER');
+    executeModules.push('M16_CARD_AIRLINE_TRANSFER_PLANNER');
+  }
+  // P17 Flight Hotel Combo
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'flight_hotel_combo'
+  ) {
+    activePatterns.push('P17_FLIGHT_HOTEL_COMBO');
+    executeModules.push('M17_FLIGHT_HOTEL_COMBO_PLANNER');
+  }
+  // P18 Family Pooling
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'family_pooling'
+  ) {
+    activePatterns.push('P18_FAMILY_POOLING');
+    executeModules.push('M18_FAMILY_POOLING_RULE_CHECK');
+  }
+  // P19 Business Personal Trip
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'business_personal_trip'
+  ) {
+    activePatterns.push('P19_BUSINESS_PERSONAL_TRIP');
+    executeModules.push('M19_BUSINESS_PERSONAL_TRIP_CHECK');
+  }
+
+  // P20 Country Based Optimization
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'country_based_optimization'
+  ) {
+    activePatterns.push('P20_COUNTRY_BASED_OPTIMIZATION');
+    executeModules.push('M20_COUNTRY_BASED_OPTIMIZATION_PLANNER');
+  }
+  // P21 Mileage Portfolio
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'mileage_portfolio'
+  ) {
+    activePatterns.push('P21_MILEAGE_PORTFOLIO');
+    executeModules.push('M21_MILEAGE_PORTFOLIO_PLANNER');
+  }
+
+  // P22 Urgent Booking
+  if (
+    intake &&
+    intake.primaryGoal === 'travel_air' &&
+    intake.urgency === 'urgent'
+  ) {
+    activePatterns.push('P22_URGENT_BOOKING');
+    executeModules.push('M22_URGENT_BOOKING_PLANNER');
+  }
+
+  // P23 ShortLong Haul Mix
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'short_long_haul_mix'
+  ) {
+    activePatterns.push('P23_SHORT_LONG_HAUL_MIX');
+    executeModules.push('M23_SHORT_LONG_HAUL_MIX_PLANNER');
+  }
+
+  // P24 Hotel Chain Mix
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'hotel_chain_mix'
+  ) {
+    activePatterns.push('P24_HOTEL_CHAIN_MIX');
+    executeModules.push('M24_HOTEL_CHAIN_MIX_PLANNER');
+  }
+
+  // P25 Large Balance Cleanup
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'large_balance_cleanup'
+  ) {
+    activePatterns.push('P25_LARGE_BALANCE_CLEANUP');
+    executeModules.push('M25_LARGE_BALANCE_CLEANUP_PLANNER');
+  }
+
+  // P26 Rule Change
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'rule_change'
+  ) {
+    activePatterns.push('P26_RULE_CHANGE');
+    executeModules.push('M26_RULE_CHANGE_CHECK');
+  }
+  // P27 Multi Points Parallel
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'multi_points_parallel'
+  ) {
+    activePatterns.push('P27_MULTI_POINTS_PARALLEL');
+    executeModules.push('M27_MULTI_POINTS_PARALLEL_PLANNER');
+  }
+
+  // P28 AirHotel Split
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'air_hotel_split'
+  ) {
+    activePatterns.push('P28_AIR_HOTEL_SPLIT');
+    executeModules.push('M28_AIR_HOTEL_SPLIT_PLANNER');
+  }
+
+  // P29 Card AB Mix
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'card_ab_mix'
+  ) {
+    activePatterns.push('P29_CARD_AB_MIX');
+    executeModules.push('M29_CARD_AB_MIX_PLANNER');
+  }
+  // P30 Buy Points vs Pay Cash
+  if (
+    intake &&
+    intake.primaryGoal === 'cash_finance' &&
+    intake.scenario === 'buy_points_vs_pay_cash'
+  ) {
+    activePatterns.push('P30_BUY_POINTS_VS_PAY_CASH');
+    executeModules.push('M30_BUY_POINTS_VS_PAY_CASH_ANALYZER');
+  }
+
+  // P31 Mileage Purchase Threshold
+  if (
+    intake &&
+    intake.primaryGoal === 'cash_finance' &&
+    intake.scenario === 'mileage_purchase_threshold'
+  ) {
+    activePatterns.push('P31_MILEAGE_PURCHASE_THRESHOLD');
+    executeModules.push('M31_MILEAGE_PURCHASE_THRESHOLD_CHECK');
+  }
+
+  // P32 Cash Top-up Strategy
+  if (
+    intake &&
+    intake.primaryGoal === 'cash_finance' &&
+    intake.scenario === 'cash_topup_strategy'
+  ) {
+    activePatterns.push('P32_CASH_TOPUP_STRATEGY');
+    executeModules.push('M32_CASH_TOPUP_STRATEGY_PLANNER');
+  }
+
+  // P33 Promo Timing Purchase
+  if (
+    intake &&
+    intake.primaryGoal === 'cash_finance' &&
+    intake.scenario === 'promo_timing_purchase'
+  ) {
+    activePatterns.push('P33_PROMO_TIMING_PURCHASE');
+    executeModules.push('M33_PROMO_TIMING_PURCHASE_ANALYZER');
+  }
+  // P34 Public Official Travel
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'public_official_travel'
+  ) {
+    activePatterns.push('P34_PUBLIC_OFFICIAL_TRAVEL');
+    executeModules.push('M34_PUBLIC_OFFICIAL_TRAVEL_CHECK');
+  }
+
+  // P35 Corporate Personal
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corporate_personal'
+  ) {
+    activePatterns.push('P35_CORPORATE_PERSONAL');
+    executeModules.push('M35_CORPORATE_PERSONAL_CHECK');
+  }
+
+  // P36 Corporate Card Ownership
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corporate_card_ownership'
+  ) {
+    activePatterns.push('P36_CORPORATE_CARD_OWNERSHIP');
+    executeModules.push('M36_CORPORATE_CARD_OWNERSHIP_CHECK');
+  }
+
+  // P37 Role-based Benefit Gap
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'role_based_benefit_gap'
+  ) {
+    activePatterns.push('P37_ROLE_BASED_BENEFIT_GAP');
+    executeModules.push('M37_ROLE_BASED_BENEFIT_GAP_CHECK');
+  }
+  // P38 Targeted Promo
+  if (
+    intake &&
+    intake.primaryGoal === 'optimization' &&
+    intake.scenario === 'targeted_promo' &&
+    intake.urgency === 'urgent'
+  ) {
+    activePatterns.push('P38_TARGETED_PROMO');
+    executeModules.push('M38_TARGETED_PROMO_ANALYZER');
+  }
+
+  // P39 Promo Stacking
+  if (
+    intake &&
+    intake.primaryGoal === 'optimization' &&
+    intake.scenario === 'promo_stacking'
+  ) {
+    activePatterns.push('P39_PROMO_STACKING');
+    executeModules.push('M39_PROMO_STACKING_ANALYZER');
+  }
+
+  // P40 Double Dipping
+  if (
+    intake &&
+    intake.primaryGoal === 'optimization' &&
+    intake.scenario === 'double_dipping'
+  ) {
+    activePatterns.push('P40_DOUBLE_DIPPING');
+    executeModules.push('M40_DOUBLE_DIPPING_ANALYZER');
+  }
+
+  // P41 Promo vs Standard
+  if (
+    intake &&
+    intake.primaryGoal === 'optimization' &&
+    intake.scenario === 'promo_vs_standard' &&
+    intake.urgency === 'urgent'
+  ) {
+    activePatterns.push('P41_PROMO_VS_STANDARD');
+    executeModules.push('M41_PROMO_VS_STANDARD_ANALYZER');
+  }
+  // P42 Family Transfer
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'family_transfer'
+  ) {
+    activePatterns.push('P42_FAMILY_TRANSFER');
+    executeModules.push('M42_FAMILY_TRANSFER_CHECK');
+  }
+
+  // P43 Transfer Fee Value
+  if (
+    intake &&
+    intake.primaryGoal === 'cash_finance' &&
+    intake.scenario === 'transfer_fee_value'
+  ) {
+    activePatterns.push('P43_TRANSFER_FEE_VALUE');
+    executeModules.push('M43_TRANSFER_FEE_VALUE_ANALYZER');
+  }
+
+  // P44 Gift Inheritance
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'gift_inheritance'
+  ) {
+    activePatterns.push('P44_GIFT_INHERITANCE');
+    executeModules.push('M44_GIFT_INHERITANCE_CHECK');
+  }
+
+  // P45 Account Merge
+  if (
+    intake &&
+    intake.primaryGoal === 'portfolio' &&
+    intake.scenario === 'account_merge'
+  ) {
+    activePatterns.push('P45_ACCOUNT_MERGE');
+    executeModules.push('M45_ACCOUNT_MERGE_PLANNER');
+  }
+  // P46 Corp Code vs Promo
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corp_code_vs_promo'
+  ) {
+    activePatterns.push('P46_CORP_CODE_VS_PROMO');
+    executeModules.push('M46_CORP_CODE_VS_PROMO_CHECK');
+  }
+
+  // P47 Corp Code Earn
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corp_code_earn'
+  ) {
+    activePatterns.push('P47_CORP_CODE_EARN');
+    executeModules.push('M47_CORP_CODE_EARN_CHECK');
+  }
+
+  // P48 Corp Code Redeem
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corp_code_redeem'
+  ) {
+    activePatterns.push('P48_CORP_CODE_REDEEM');
+    executeModules.push('M48_CORP_CODE_REDEEM_CHECK');
+  }
+
+  // P49 Corp Code Elite
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corp_code_elite'
+  ) {
+    activePatterns.push('P49_CORP_CODE_ELITE');
+    executeModules.push('M49_CORP_CODE_ELITE_CHECK');
+  }
+
+  // P50 Corp Code Stacking
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'corp_code_stacking'
+  ) {
+    activePatterns.push('P50_CORP_CODE_STACKING');
+    executeModules.push('M50_CORP_CODE_STACKING_CHECK');
+  }
+
+  // P51 Compliance Risk
+  if (
+    intake &&
+    intake.primaryGoal === 'compliance' &&
+    intake.scenario === 'compliance_risk'
+  ) {
+    activePatterns.push('P51_COMPLIANCE_RISK');
+    executeModules.push('M51_COMPLIANCE_RISK_CHECK');
+  }
+
+
+  return {
+    caseId,
+    activePatterns,
+    executeModules
+  };
+}
+
+
+
+
+
+
+// HTTP 엔드포인트 이름: ampIntake
+functions.http('ampIntake', async (req, res) => {
+  try {
+    // 1) 메서드 체크
+    if (req.method !== 'POST') {
+      return res.status(405).send({
+        success: false,
+        error: 'Method not allowed. Use POST.'
+      });
+    }
+
+    // 2) 입력 데이터
+    const intake = req.body || {};
+
+ // 2-1) JSON Schema 검증 (Intake v1)
+console.log('[AJV] validateIntake typeof:', typeof validateIntake);
+console.log('[AJV] validateIntake isNull:', validateIntake === null);
+console.log('[AJV] validateIntake ctor:', validateIntake?.constructor?.name);
+console.log('[AJV] validateIntake tag:', Object.prototype.toString.call(validateIntake));
+
+let keys = null, keysErr = null;
+try { keys = Object.keys(validateIntake); }
+catch (e) { keysErr = e?.message || String(e); }
+
+console.log('[AJV] validateIntake keys:', keys);
+console.log('[AJV] validateIntake keysErr:', keysErr);
+
+// 1) validator가 함수가 아니면 500으로 막기
+if (typeof validateIntake !== 'function') {
+  console.error('[AJV] Validator is not a function. Validation disabled.', {
+    typeof: typeof validateIntake,
+    value: validateIntake
+  });
+  return res.status(500).send({
+    success: false,
+    message: 'Server misconfiguration: AJV validator is not available'
+  });
+}
+
+// 2) 실제 스키마 검증
+if (!validateIntake(intake)) {
+  const errors = validateIntake.errors || [];
+  return res.status(400).send({
+    success: false,
+    message: 'Invalid AMP intake payload',
+    errors: errors.map(e => ({
+      instancePath: e.instancePath,
+      keyword: e.keyword,
+      message: e.message,
+      params: e.params
+    }))
+  });
+}
+
+
+
+
+
+
+    // 3) caseId 생성
+    const ts = Date.now();
+    const rand = Math.random().toString(36).substring(2, 7);
+    const caseId =
+      intake.meta && intake.meta.caseId
+        ? intake.meta.caseId
+        : `AMP-${ts}-${rand}`;
+
+    // 4) plan 계산
+    const plan = resolveAMPPlan(intake, caseId);
+
+    // 5) TODO: 저장/이메일
+
+    // 6) 성공 응답
+    return res.status(200).send({
+      success: true,
+      caseId: plan.caseId,
+      activePatterns: plan.activePatterns,
+      executeModules: plan.executeModules,
+      message: 'AMP intake received. Analysis will start soon.'
+    });
+  } catch (err) {
+    console.error('AMP Intake Error', err);
+    return res.status(500).send({
+      success: false,
+      error: err.message || 'Unknown error'
+    });
+  }
+});
+
