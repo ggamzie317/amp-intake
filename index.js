@@ -27,7 +27,7 @@ const validateIntake = ajv.compile(intakeSchema);
 async function defaultHandler(moduleId, data) {
   return {
     status: 'pending',
-    message: `모듈 [${moduleId}]의 로직이 아직 구현되지 않았습니다. (시뮬레이션 모드)`,
+    message: `Module [${moduleId}] logic not implemented yet (simulation mode)`,
     timestamp: new Date().toISOString()
   };
 }
