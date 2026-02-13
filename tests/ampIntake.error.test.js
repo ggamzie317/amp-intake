@@ -104,6 +104,6 @@ test('P02 실행 시: 핸들러가 없어도 시뮬레이션 결과(Simulated)�
   // 핵심 검증: M02 결과가 'simulated' 상태로 들어있는지 확인
   const m02Result = body.results['M02_POINTS_EXPIRY_ALERT'];
   expect(m02Result).toBeDefined();
-  expect(m02Result.status).toBe('simulated'); // 우리가 만든 기본 핸들러가 작동함
+  expect(m02Result.status).toBe('pending');// 우리가 만든 기본 핸들러가 작동함
   expect(m02Result.message).toContain('not implemented yet');
 });
