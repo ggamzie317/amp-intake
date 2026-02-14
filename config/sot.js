@@ -1,12 +1,4 @@
-mkdir -p config
-cat > config/sot.js <<'EOF'
 'use strict';
-
-/**
- * AMP SOT (Single Source of Truth) — Phase 1 (Minimal)
- * - Core policy: lang / unimplemented statusKey / i18n message templates
- * - Keep HTTP status handling separate (API-level).
- */
 
 const SOT = {
   global: {
@@ -14,7 +6,6 @@ const SOT = {
     unimplementedStatusKey: 'pending',
   },
 
-  // Module-level status keys (NOT HTTP status)
   statusKeys: {
     pending: { behavior: 'warn' },
     success: { behavior: 'normal' },
@@ -22,8 +13,6 @@ const SOT = {
     simulated: { behavior: 'normal' },
   },
 
-  // Message templates (key -> { en, ko })
-  // Template tokens: {moduleId}, {modeLabel}
   messages: {
     MODULE_NOT_IMPLEMENTED: {
       en: 'Module [{moduleId}] logic not implemented yet ({modeLabel})',
@@ -49,4 +38,3 @@ function resolveLang(lang) {
 }
 
 module.exports = { SOT, resolveLang, isSupportedLang };
-EOF
