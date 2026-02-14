@@ -91,7 +91,7 @@ async function ampIntake(req, res) {
     const plan = resolveAMPPlan(intake.routing, caseId);
 
     // [정석적 접근] 라우팅이 결정되면 즉시 해당 모듈들을 실행합니다.
-    const results = await executeModules(plan.executeModules, intake);
+    const results = await executeModules(plan.executeModules, intake, intake.meta?.lang);
 
     return res.status(200).send({
       success: true,
