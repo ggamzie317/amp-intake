@@ -40,6 +40,7 @@ describe('AMP Intake Contract Tests', () => {
 
     expect(statusCode).toBe(200);
     expect(body).toHaveProperty('success', true);
+    expect(body).toHaveProperty('messageKey', 'AMP_INTAKE_SUCCESS');
     expect(typeof body.caseId).toBe('string');
     expect(Array.isArray(body.activePatterns)).toBe(true);
     expect(Array.isArray(body.executeModules)).toBe(true);
