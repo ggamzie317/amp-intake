@@ -84,7 +84,13 @@ async function ampIntake(req, res) {
 
     const intake = req.body;
     if (!validateIntake(intake)) {
-      return res.status(400).send({ success: false, errors: validateIntake.errors });
+      return res.status(400).send({
+  success: false,
+  messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
+  message: 'Invalid intake payload.',
+  errors: validateIntake.errors
+});
+
     }
 
     const caseId = intake.meta?.caseId || `AMP-${Date.now()}`;
