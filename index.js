@@ -28,7 +28,7 @@ const validateIntake = ajv.compile(intakeSchema);
 async function defaultHandler(moduleId, data) {
   return {
     status: 'pending',
-    message: `Module [${moduleId}] logic not implemented yet (simulation mode)`,
+    message: makeUnimplementedResult(moduleId, 'en', 'simulation').message,
     timestamp: new Date().toISOString()
   };
 }
