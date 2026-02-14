@@ -99,6 +99,7 @@ async function ampIntake(req, res) {
       activePatterns: plan.activePatterns,
       executeModules: plan.executeModules,
       results, // 실제/가공된 결과 데이터가 나가는 곳
+      messageKey: 'AMP_INTAKE_SUCCESS',
       message: 'AMP 분석이 완료되었습니다.'
     });
   } catch (err) {
