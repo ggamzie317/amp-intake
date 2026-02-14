@@ -26,6 +26,18 @@ const SOT = {
       en: 'production mode',
       ko: '프로덕션 모드',
     },
+AMP_INTAKE_SUCCESS: {
+  en: 'AMP analysis completed.',
+  ko: 'AMP 분석이 완료되었습니다.',
+},
+AMP_INTAKE_VALIDATION_FAILED: {
+  en: 'Invalid intake payload.',
+  ko: '입력값이 올바르지 않습니다.',
+},
+AMP_INTAKE_INTERNAL_ERROR: {
+  en: 'Internal server error.',
+  ko: '서버 내부 오류가 발생했습니다.',
+},
   },
 };
 
