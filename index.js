@@ -25,7 +25,7 @@ const validateIntake = ajv.compile(intakeSchema);
 
 // --- 3. 기본 핸들러 (미구현 모듈용 안전망) ---
 // 이 녀석 덕분에 51개 모듈을 한 번에 다 안 짜도 시스템이 터지지 않습니다.
-async function defaultHandler(moduleId, data) {
+async function defaultHandler(moduleId, data, lang) {
   return {
     status: makeUnimplementedResult(moduleId, 'en', 'simulation').status,
     message: makeUnimplementedResult(moduleId, 'en', 'simulation').message,
