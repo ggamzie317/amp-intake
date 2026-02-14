@@ -27,8 +27,8 @@ const validateIntake = ajv.compile(intakeSchema);
 // 이 녀석 덕분에 51개 모듈을 한 번에 다 안 짜도 시스템이 터지지 않습니다.
 async function defaultHandler(moduleId, data) {
   return {
-    status: 'pending',
-    message: makeUnimplementedResult(moduleId, 'en', 'simulation').message,
+    status: makeUnimplementedResult(moduleId, 'en', 'simulation').status,
+message: makeUnimplementedResult(moduleId, 'en', 'simulation').message,
     timestamp: new Date().toISOString()
   };
 }
