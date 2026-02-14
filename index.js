@@ -109,7 +109,12 @@ async function ampIntake(req, res) {
       message: 'AMP 분석이 완료되었습니다.'
     });
   } catch (err) {
-    return res.status(500).send({ success: false, error: err.message });
+    return res.status(500).send({
+  success: false,
+  messageKey: 'AMP_INTAKE_INTERNAL_ERROR',
+  message: 'Internal server error.',
+  error: err.message
+});
   }
 }
 
