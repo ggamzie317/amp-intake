@@ -44,7 +44,7 @@ async function executeModules(moduleIds, inputData, lang) {
   for (const mid of moduleIds) {
     const handler = MODULE_HANDLERS[mid] || ((data) => defaultHandler(mid, data, lang));
     try {
-      results[mid] = await handler(inputData);
+      results[mid] = await handler(inputData, lang);
     } catch (err) {
       results[mid] = { status: 'error', message: err.message };
     }
