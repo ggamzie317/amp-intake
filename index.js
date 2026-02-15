@@ -2,6 +2,7 @@
 const cashHandlers = require('./handlers/cashHandlers'); // 기존 M01 등 이동 후 호출
 const travelHandlers = require('./handlers/travelHandlers'); // 새로 만든 P06용
 const { makeUnimplementedResult } = require('./utils/message');
+const { renderMessage, resolveLang } = require('./config/sot');
 
 // 1. 중복된 선언을 하나로 합칩니다.
 const MODULE_HANDLERS = {
