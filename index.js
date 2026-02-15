@@ -108,7 +108,7 @@ async function ampIntake(req, res) {
       executeModules: plan.executeModules,
       results, // 실제/가공된 결과 데이터가 나가는 곳
       messageKey: 'AMP_INTAKE_SUCCESS',
-      message: 'AMP 분석이 완료되었습니다.'
+      message: renderMessage('AMP_INTAKE_SUCCESS', {}, lang)
     });
   } catch (err) {
     return res.status(500).send({
