@@ -89,7 +89,7 @@ async function ampIntake(req, res) {
       return res.status(400).send({
   success: false,
   messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
-  message: 'Invalid intake payload.',
+  message: renderMessage('AMP_INTAKE_VALIDATION_FAILED', {}, lang),
   errors: validateIntake.errors
 });
 
