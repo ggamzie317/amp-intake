@@ -94,8 +94,7 @@ async function ampIntake(req, res) {
         messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
         message: renderMessage('AMP_INTAKE_VALIDATION_FAILED', {}, lang),
         errors: validateIntake.errors
-});
-
+      });
     }
 
     const caseId = intake.meta?.caseId || `AMP-${Date.now()}`;
