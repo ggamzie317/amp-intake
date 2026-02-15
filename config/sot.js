@@ -26,18 +26,26 @@ const SOT = {
       en: 'production mode',
       ko: '프로덕션 모드',
     },
-AMP_INTAKE_SUCCESS: {
-  en: 'AMP analysis completed.',
-  ko: 'AMP 분석이 완료되었습니다.',
-},
-AMP_INTAKE_VALIDATION_FAILED: {
-  en: 'Invalid intake payload.',
-  ko: '입력값이 올바르지 않습니다.',
-},
-AMP_INTAKE_INTERNAL_ERROR: {
-  en: 'Internal server error.',
-  ko: '서버 내부 오류가 발생했습니다.',
-},
+
+    AMP_INTAKE_SUCCESS: {
+      en: 'AMP analysis completed.',
+      ko: 'AMP 분석이 완료되었습니다.',
+    },
+
+    AMP_INTAKE_VALIDATION_FAILED: {
+      en: 'Invalid intake payload.',
+      ko: '입력값이 올바르지 않습니다.',
+    },
+
+    AMP_INTAKE_INTERNAL_ERROR: {
+      en: 'Internal server error.',
+      ko: '서버 내부 오류가 발생했습니다.',
+    },
+
+    AMP_INTAKE_METHOD_NOT_ALLOWED: {
+      en: 'Method not allowed.',
+      ko: '허용되지 않은 요청 방식입니다.',
+    },
   },
 };
 
@@ -48,6 +56,7 @@ function isSupportedLang(lang) {
 function resolveLang(lang) {
   return isSupportedLang(lang) ? lang : SOT.global.defaultLang;
 }
+
 function renderMessage(messageKey, params = {}, lang) {
   const resolved = resolveLang(lang);
   const entry = SOT.messages?.[messageKey];
@@ -66,4 +75,3 @@ function renderMessage(messageKey, params = {}, lang) {
 }
 
 module.exports = { SOT, resolveLang, isSupportedLang, renderMessage };
-
