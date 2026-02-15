@@ -87,10 +87,10 @@ async function ampIntake(req, res) {
     const lang = resolveLang(intake?.meta?.lang);
     if (!validateIntake(intake)) {
       return res.status(400).send({
-  success: false,
-  messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
-  message: renderMessage('AMP_INTAKE_VALIDATION_FAILED', {}, lang),
-  errors: validateIntake.errors
+        success: false,
+        messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
+        message: renderMessage('AMP_INTAKE_VALIDATION_FAILED', {}, lang),
+        errors: validateIntake.errors
 });
 
     }
