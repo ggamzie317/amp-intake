@@ -48,5 +48,22 @@ function isSupportedLang(lang) {
 function resolveLang(lang) {
   return isSupportedLang(lang) ? lang : SOT.global.defaultLang;
 }
+function renderMessage(messageKey, params = {}, lang) {
+  const resolved = resolveLang(lang);
+  const entry = SOT.messages?.[messageKey];
 
-module.exports = { SOT, resolveLang, isSupportedLang };
+  let template =
+    (entry && entry[resolved]) ||
+    (entry && entry[SOT.global.defaultLang]) ||
+    messageKey;
+
+  // [{key}] 형태 치환
+  for (const [k, v] of Object.entries(params || {})) {
+    template = template.split(`[{${k}}]`).join(String(v));
+  }
+
+  return template;
+}
+
+module.exports = { SOT, resolveLang, isSupportedLang, renderMessage };
+
