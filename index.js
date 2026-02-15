@@ -84,6 +84,7 @@ async function ampIntake(req, res) {
     if (req.method !== 'POST') return res.status(405).send({ success: false });
 
     const intake = req.body;
+    const lang = resolveLang(intake?.meta?.lang);
     if (!validateIntake(intake)) {
       return res.status(400).send({
   success: false,
