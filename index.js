@@ -58,21 +58,21 @@ const { PATTERNS } = require('./patterns'); // 만약 별도 파일로 뺐다면
 
 function resolveAMPPlan(input, caseId) {
   const activePatterns = [];
-  const executeModules = [];
+  const modulesToExecute = [];
   const patternDetails = [];
 
   for (const p of PATTERNS) {
     if (matchesWhen(input, p.when)) {
       activePatterns.push(p.id);
       patternDetails.push({ id: p.id, message: p.message || `Pattern ${p.id} active` });
-      if (p.modules) executeModules.push(...p.modules);
+      if (p.modules) modulesToExecute.push(...p.modules);
     }
   }
 
   return {
     caseId,
     activePatterns: [...new Set(activePatterns)],
-    executeModules: [...new Set(executeModules)],
+    executeModules: [...new Set(modulesToExecute)],
     patternDetails
   };
 }
