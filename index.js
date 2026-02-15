@@ -84,7 +84,14 @@ function matchesWhen(input, condition) {
 // --- 6. 메인 엔트리포인트 (ampIntake) ---
 async function ampIntake(req, res) {
   try {
-    if (req.method !== 'POST') return res.status(405).send({ success: false });
+    if (req.method !== 'POST') {
+  const lang = resolveLang(req.body?.meta?.lang);
+  return res.status(405).send({
+    success: false,
+    messageKey: 'AMP_INTAKE_METHOD_NOT_ALLOWED',
+    message: renderMessage('AMP_INTAKE_METHOD_NOT_ALLOWED', {}, lang),
+  });
+}
 
     const intake = req.body;
     const lang = resolveLang(intake?.meta?.lang);
