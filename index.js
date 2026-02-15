@@ -42,7 +42,7 @@ async function executeModules(moduleIds, inputData, lang) {
   const results = {};
   // 51개 모듈 중 무엇이 들어와도 여기서 처리됨
   for (const mid of moduleIds) {
-    const handler = MODULE_HANDLERS[mid] || ((data) => defaultHandler(mid, data, lang));
+    const handler = MODULE_HANDLERS[mid] || ((data, l) => defaultHandler(mid, data, l));
     try {
       results[mid] = await handler(inputData, lang);
     } catch (err) {
