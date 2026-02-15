@@ -114,7 +114,7 @@ async function ampIntake(req, res) {
     return res.status(500).send({
   success: false,
   messageKey: 'AMP_INTAKE_INTERNAL_ERROR',
-  message: 'Internal server error.',
+  message: renderMessage('AMP_INTAKE_INTERNAL_ERROR', {}, resolveLang(req.body?.meta?.lang)),
   error: err.message
 });
   }
