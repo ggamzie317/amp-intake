@@ -1,4 +1,6 @@
-// 상단에 추가
+// index.js
+
+// --- 0. 모듈 핸들러 로드 ---
 const cashHandlers = require('./handlers/cashHandlers'); // 기존 M01 등 이동 후 호출
 const travelHandlers = require('./handlers/travelHandlers'); // 새로 만든 P06용
 const { makeUnimplementedResult } = require('./utils/message');
@@ -11,9 +13,6 @@ const MODULE_HANDLERS = {
   // 앞으로 M02, M03 등을 여기에 추가
 };
 
-// ... (아래 2번 섹션 전체를 삭제하거나 위 핸들러 객체와 통합하세요)
-// --- 2. 모듈별 실제 비즈니스 로직 (핸들러) --- 부분을 삭제하세요.
-
 const Ajv = (require('ajv').default || require('ajv'));
 const addFormats = require('ajv-formats');
 const intakeSchema = require('./amp-intake-v1.schema.json');
@@ -23,7 +22,6 @@ const ajv = new Ajv({ allErrors: true, strictSchema: false, strictTypes: false }
 addFormats(ajv);
 const validateIntake = ajv.compile(intakeSchema);
 
-
 // --- 3. 기본 핸들러 (미구현 모듈용 안전망) ---
 // 이 녀석 덕분에 51개 모듈을 한 번에 다 안 짜도 시스템이 터지지 않습니다.
 async function defaultHandler(moduleId, data, lang) {
@@ -32,29 +30,31 @@ async function defaultHandler(moduleId, data, lang) {
   return {
     status: r.status,
     message: r.message,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   };
 }
-
 
 // --- 4. 핵심 실행 로직 (Executor) ---
 async function executeModules(moduleIds, inputData, lang) {
   const results = {};
-  // 51개 모듈 중 무엇이 들어와도 여기서 처리됨
+
   for (const mid of moduleIds) {
+    // 모든 핸들러 시그니처를 (data, lang)으로 통일
     const handler = MODULE_HANDLERS[mid] || ((data, l) => defaultHandler(mid, data, l));
+
     try {
+      // lang 전달 (핸들러가 안 받으면 무시됨)
       results[mid] = await handler(inputData, lang);
     } catch (err) {
       results[mid] = { status: 'error', message: err.message };
     }
   }
+
   return results;
 }
 
 // --- 5. 라우팅 로직 (PATTERNS 기반) ---
-// (이전과 동일하게 PATTERNS 배열 유지)
-const { PATTERNS } = require('./patterns'); // 만약 별도 파일로 뺐다면 호출, 아니면 하단 정의
+const { PATTERNS } = require('./patterns'); // 별도 파일이면 require, 아니면 하단 정의
 
 function resolveAMPPlan(input, caseId) {
   const activePatterns = [];
@@ -73,7 +73,7 @@ function resolveAMPPlan(input, caseId) {
     caseId,
     activePatterns: [...new Set(activePatterns)],
     executeModules: [...new Set(modulesToExecute)],
-    patternDetails
+    patternDetails,
   };
 }
 
@@ -84,47 +84,52 @@ function matchesWhen(input, condition) {
 // --- 6. 메인 엔트리포인트 (ampIntake) ---
 async function ampIntake(req, res) {
   try {
+    // 405도 SOT 통일
     if (req.method !== 'POST') {
-  const lang = resolveLang(req.body?.meta?.lang);
-  return res.status(405).send({
-    success: false,
-    messageKey: 'AMP_INTAKE_METHOD_NOT_ALLOWED',
-    message: renderMessage('AMP_INTAKE_METHOD_NOT_ALLOWED', {}, lang),
-  });
-}
+      const lang405 = resolveLang(req.body?.meta?.lang);
+      return res.status(405).send({
+        success: false,
+        messageKey: 'AMP_INTAKE_METHOD_NOT_ALLOWED',
+        message: renderMessage('AMP_INTAKE_METHOD_NOT_ALLOWED', {}, lang405),
+      });
+    }
 
     const intake = req.body;
     const lang = resolveLang(intake?.meta?.lang);
+
+    // 400도 SOT 통일
     if (!validateIntake(intake)) {
       return res.status(400).send({
         success: false,
         messageKey: 'AMP_INTAKE_VALIDATION_FAILED',
         message: renderMessage('AMP_INTAKE_VALIDATION_FAILED', {}, lang),
-        errors: validateIntake.errors
+        errors: validateIntake.errors,
       });
     }
 
     const caseId = intake.meta?.caseId || `AMP-${Date.now()}`;
     const plan = resolveAMPPlan(intake.routing, caseId);
 
-    // [정석적 접근] 라우팅이 결정되면 즉시 해당 모듈들을 실행합니다.
+    // 라우팅이 결정되면 즉시 해당 모듈들을 실행
     const results = await executeModules(plan.executeModules, intake, lang);
 
+    // 200도 SOT 통일
     return res.status(200).send({
       success: true,
       caseId: plan.caseId,
       activePatterns: plan.activePatterns,
       executeModules: plan.executeModules,
-      results, // 실제/가공된 결과 데이터가 나가는 곳
+      results,
       messageKey: 'AMP_INTAKE_SUCCESS',
-      message: renderMessage('AMP_INTAKE_SUCCESS', {}, lang)
+      message: renderMessage('AMP_INTAKE_SUCCESS', {}, lang),
     });
   } catch (err) {
+    // 500도 SOT 통일 (try 내 lang이 없을 수도 있으니 안전하게)
     return res.status(500).send({
       success: false,
       messageKey: 'AMP_INTAKE_INTERNAL_ERROR',
       message: renderMessage('AMP_INTAKE_INTERNAL_ERROR', {}, resolveLang(req.body?.meta?.lang)),
-      error: err.message
+      error: err.message,
     });
   }
 }
