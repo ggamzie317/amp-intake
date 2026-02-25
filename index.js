@@ -5,7 +5,7 @@ const cashHandlers = require('./handlers/cashHandlers'); // 기존 M01 등 이�
 const travelHandlers = require('./handlers/travelHandlers'); // 새로 만든 P06용
 const { makeUnimplementedResult } = require('./utils/message');
 const { renderMessage, resolveLang } = require('./config/sot');
-
+const { getAsOfDate } = require('./utils/time');
 // 1. 중복된 선언을 하나로 합칩니다.
 const MODULE_HANDLERS = {
   ...cashHandlers,
