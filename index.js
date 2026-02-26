@@ -6,6 +6,7 @@ const travelHandlers = require('./handlers/travelHandlers'); // 새로 만든 P0
 const { makeUnimplementedResult } = require('./utils/message');
 const { renderMessage, resolveLang } = require('./config/sot');
 const { getAsOfDate } = require('./utils/time');
+const { assembleReport } = require('./report/assembler');
 // 1. 중복된 선언을 하나로 합칩니다.
 const MODULE_HANDLERS = {
   ...cashHandlers,
@@ -114,15 +115,14 @@ async function ampIntake(req, res) {
     const results = await executeModules(plan.executeModules, intake, lang);
 
     // 200도 SOT 통일
-    return res.status(200).send({
-      success: true,
-      caseId: plan.caseId,
-      activePatterns: plan.activePatterns,
-      executeModules: plan.executeModules,
-      results,
-      messageKey: 'AMP_INTAKE_SUCCESS',
-      message: renderMessage('AMP_INTAKE_SUCCESS', {}, lang),
-    });
+    const report = assembleReport({
+  intake,
+  plan,
+  results,
+  lang,
+});
+
+return res.status(200).send(report);
   } catch (err) {
     // 500도 SOT 통일 (try 내 lang이 없을 수도 있으니 안전하게)
     return res.status(500).send({
