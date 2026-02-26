@@ -1,6 +1,3 @@
-// report/assembler.js
-'use strict';
-
 function assembleReport({ intake, plan, results, lang }) {
   return {
     success: true,
@@ -10,5 +7,3 @@ function assembleReport({ intake, plan, results, lang }) {
     results,
   };
 }
-
-module.exports = { assembleReport };
