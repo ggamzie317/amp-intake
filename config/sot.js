@@ -46,6 +46,16 @@ const SOT = {
       en: 'Method not allowed.',
       ko: '허용되지 않은 요청 방식입니다.',
     },
+
+    AMP_TOO_MANY_PROGRAMS: {
+      en: 'Maximum of 2 programs allowed per analysis.',
+      ko: '분석은 최대 2개 프로그램까지만 가능합니다.',
+    },
+
+    P06_TRAVEL_AIR_BASIC_COMPLETED: {
+      en: 'Basic air travel analysis prepared.',
+      ko: '항공 기본 분석이 준비되었습니다.',
+    },
   },
 };
 
