@@ -14,16 +14,21 @@ function assembleReport({ intake, plan, results, lang }) {
     caseId: plan.caseId,
     activePatterns: plan.activePatterns,
     executeModules: plan.executeModules,
+    plan,
     results,
+    evidence: {},
+    confidence: {},
+    verification: {},
 
     messageKey: 'AMP_INTAKE_SUCCESS',
     message: renderMessage('AMP_INTAKE_SUCCESS', {}, l),
 
-    // 🔹 앞으로 confidence / evidence 붙일 자리
     meta: {
       asOf: asOfDate,
       generatedAt: asOfISO,
       lang: l,
+      confidenceModel: 'stars-5',
+      evidencePolicy: 'public_sources_with_verification',
 
       disclaimer:
         l === 'ko'
