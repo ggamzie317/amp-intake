@@ -5,6 +5,7 @@ function makeBaseIntake() {
   return {
     meta: {
       caseId: 'BASE-CASE-' + Date.now(),
+      tier: 'essential',
       createdAt: new Date().toISOString(),
       locale: 'en-US',
       currency: 'USD',
