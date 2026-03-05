@@ -63,7 +63,23 @@
           "properties": {
             "entries": {
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "object",
+                "required": ["category", "brandRaw", "question"],
+                "additionalProperties": false,
+                "properties": {
+                  "category": {
+                    "type": "string",
+                    "enum": ["air", "hotel", "card"]
+                  },
+                  "brandRaw": { "type": "string", "minLength": 1 },
+                  "question": { "type": "string", "minLength": 1 },
+                  "brandKey": { "type": "string" },
+                  "balance": { "type": "number" },
+                  "notes": { "type": "string" }
+                }
+              },
+              "maxItems": 2
             },
             "sourceProgram": { "type": "string" },
             "targetProgram": { "type": "string" }

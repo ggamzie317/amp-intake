@@ -17,7 +17,10 @@ function makeBaseIntake() {
       urgency: 'normal',
     },
     domain: {
-      programs: { sourceProgram: 'DEFAULT-CARD' },
+      programs: {
+        sourceProgram: 'DEFAULT-CARD',
+        entries: [{ category: 'air', brandRaw: 'demo', question: 'baseline' }],
+      },
       balances: { pointBalance: 0, mileBalance: 0 },
       pricing: { transferRatio: 1.0 },
     },
@@ -37,12 +40,19 @@ function makeBaseIntake() {
  */
 function makeIntake(overrides = {}) {
   const base = makeBaseIntake();
+  const domainOverrides = overrides.domain || {};
   return {
     ...base,
     ...overrides,
     meta: { ...base.meta, ...(overrides.meta || {}) },
     routing: { ...base.routing, ...(overrides.routing || {}) },
-    domain: { ...base.domain, ...(overrides.domain || {}) },
+    domain: {
+      ...base.domain,
+      ...domainOverrides,
+      programs: { ...base.domain.programs, ...(domainOverrides.programs || {}) },
+      balances: { ...base.domain.balances, ...(domainOverrides.balances || {}) },
+      pricing: { ...base.domain.pricing, ...(domainOverrides.pricing || {}) },
+    },
     policy: { ...base.policy, ...(overrides.policy || {}) },
   };
 }

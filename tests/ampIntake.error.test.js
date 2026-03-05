@@ -82,6 +82,55 @@ describe('AMP Intake Negative & Error Tests', () => {
     expect(JSON.stringify(body.errors)).toContain('createdAt');
   });
 
+  test('실패: domain.programs.entries가 3개면 스키마 검증 실패여야 한다', async () => {
+    const intake = makeIntake({
+      domain: {
+        programs: {
+          sourceProgram: 'DEFAULT-CARD',
+          entries: [
+            { category: 'air', brandRaw: 'Delta', question: 'award seats?' },
+            { category: 'hotel', brandRaw: 'Hilton Honors', question: 'value?' },
+            { category: 'card', brandRaw: 'Amex MR', question: 'transfer options?' },
+          ],
+        },
+      },
+    });
+
+    const { req, res, getResult } = createMockReqRes(intake);
+    await ampIntake(req, res);
+    const { statusCode, body } = getResult();
+
+    expect(statusCode).toBe(400);
+    expect(body.success).toBe(false);
+    expect(body.messageKey).toBe('AMP_INTAKE_VALIDATION_FAILED');
+    const errorDetails = JSON.stringify(body.errors);
+    expect(
+      errorDetails.includes('maxItems') ||
+      errorDetails.includes('/domain/programs/entries')
+    ).toBe(true);
+  });
+
+  test('성공: mixed categories 2개 entries는 스키마 검증을 통과해야 한다', async () => {
+    const intake = makeIntake({
+      domain: {
+        programs: {
+          sourceProgram: 'DEFAULT-CARD',
+          entries: [
+            { category: 'card', brandRaw: 'Amex MR', question: 'transfer options?' },
+            { category: 'hotel', brandRaw: 'Marriott Bonvoy', question: 'Tokyo redemption?' },
+          ],
+        },
+      },
+    });
+
+    const { req, res, getResult } = createMockReqRes(intake);
+    await ampIntake(req, res);
+    const { statusCode, body } = getResult();
+
+    expect(statusCode).toBe(200);
+    expect(body.success).toBe(true);
+  });
+
 });
 // ... 기존 코드 아래에 추가 ...
 
