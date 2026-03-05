@@ -18,6 +18,7 @@ const PATTERNS = [
   { id: 'P43_TRANSFER_FEE_VALUE', when: { primaryGoal: 'cash_finance', scenario: 'transfer_fee_value' }, modules: ['M43_TRANSFER_FEE_VALUE_ANALYZER'] },
 
   // --- TRAVEL AIR (P06-P10, P22, P34-P35) ---
+  { id: 'P06_TRAVEL_AIR_BASIC', when: { primaryGoal: 'travel_air', scenario: 'one_way' }, modules: ['P06_TRAVEL_AIR_BASIC'] },
   { id: 'P06_ECONOMY_VS_BUSINESS', when: { primaryGoal: 'travel_air', scenario: 'economy_vs_business' }, modules: ['M06_ECONOMY_BUSINESS_COMPARISON'] },
   { id: 'P07_UPGRADE_VS_FULL_REDEMPTION', when: { primaryGoal: 'travel_air', scenario: 'upgrade_vs_full_redemption' }, modules: ['M07_UPGRADE_VS_FULL_REDEEM_ANALYZER'] },
   { id: 'P08_PEAK_VS_OFFPEAK', when: { primaryGoal: 'travel_air', scenario: 'peak_vs_offpeak' }, modules: ['M08_PEAK_OFFPEAK_TIMING_ANALYZER'] },
