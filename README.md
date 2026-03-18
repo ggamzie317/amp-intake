@@ -26,6 +26,7 @@ Key Features:
 - Tier-aware report assembly (Essential / Strategic / Executive)
 - Max 2 program analysis limit
 - Evidence / Confidence / Verification layer included
+- Report template skeleton: [docs/report-template-v1.md](docs/report-template-v1.md)
 - 70/70 tests passing
 - Stable tag: v1.1-assembler-stable
 
@@ -84,4 +85,3 @@ Key Features:
 - `meta.tier` is optional and must be one of `essential`, `strategic`, or `executive`.
 - `domain.programs.entries` is optional, allows mixed `air` / `hotel` / `card` categories, and is limited to 2 typed objects.
 - `domain.programs.sourceProgram` remains required even when `entries` is present.
-
