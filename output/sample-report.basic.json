@@ -1,0 +1,53 @@
+{
+  "executive_summary": {
+    "decision_snapshot": "Transfer only if partner award space is available for the target one-way route.",
+    "value_signal": "Points can outperform cash pricing when taxes remain low and transfer timing is controlled."
+  },
+  "recommendation": {
+    "primary_option": "Hold points until partner availability is confirmed, then transfer and book.",
+    "booking_strategy": "Check one-way partner award space first, then compare final taxes against the cash fare before moving points.",
+    "why_this_option": "This keeps flexibility while preserving upside if an award seat opens at acceptable value.",
+    "tradeoffs": [
+      "Award availability may disappear quickly.",
+      "Cash fare may still be better if taxes or fees are high."
+    ]
+  },
+  "fare_points_comparison": {
+    "options": [
+      {
+        "label": "Cash booking",
+        "estimated_cost": "$185",
+        "strength": "Simple and immediate."
+      },
+      {
+        "label": "Points transfer and award booking",
+        "estimated_cost": "15,000 points + taxes",
+        "strength": "Potentially better value if award space is open."
+      }
+    ],
+    "comparison_note": "Use the award path only when partner space and final taxes remain favorable."
+  },
+  "assumptions": [
+    "Travel is one-way and dates are flexible within a narrow window.",
+    "Transfer ratio is 1.0.",
+    "No elite benefits or companion certificates are applied."
+  ],
+  "evidence": [
+    {
+      "type": "official",
+      "label": "Program transfer partner guide",
+      "source": "Issuer transfer page",
+      "url": "https://example.com/official-transfer-guide"
+    },
+    {
+      "type": "official",
+      "label": "Partner award booking reference",
+      "source": "Partner award page",
+      "url": "https://example.com/award-booking-reference"
+    }
+  ],
+  "next_action": {
+    "immediate_step": "Check award availability for the exact one-way route before transferring points.",
+    "watch_item": "Re-check taxes, fees, and transfer timing before booking."
+  }
+}
