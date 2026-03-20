@@ -1,0 +1,68 @@
+{
+  "executive_summary": {
+    "decision_snapshot": "Proceed with the transfer only after partner space, final taxes, and backup cash pricing are confirmed on the same day.",
+    "value_signal": "Premium review favors the award path when redemption value stays above the cash equivalent and flexibility risk remains acceptable.",
+    "priority_watchout": "Availability volatility is the main execution risk."
+  },
+  "recommendation": {
+    "primary_option": "Confirm partner seat space, then transfer points and issue the one-way award booking.",
+    "booking_strategy": "Run a same-session comparison across cash fare, direct transfer, and delayed booking fallback before moving points.",
+    "why_this_option": "This preserves optionality while capturing better point value if award space is real and taxes remain controlled.",
+    "tradeoffs": [
+      "Award space can disappear before transfer completes.",
+      "Cash may still be superior if taxes increase or routing quality drops."
+    ],
+    "fallback_option": "Book cash if award inventory closes or taxes erode redemption value."
+  },
+  "fare_points_comparison": {
+    "options": [
+      {
+        "label": "Cash booking",
+        "estimated_cost": "$185",
+        "strength": "Fastest path with no transfer risk."
+      },
+      {
+        "label": "Points transfer and award booking",
+        "estimated_cost": "15,000 points + $27 taxes",
+        "strength": "Best value when partner space is available."
+      },
+      {
+        "label": "Wait and re-check later",
+        "estimated_cost": "Potentially unchanged cash fare or lost award seat",
+        "strength": "Preserves flexibility but increases execution risk."
+      }
+    ],
+    "comparison_note": "Premium review includes a fallback path so the client can decide between value capture and booking certainty."
+  },
+  "assumptions": [
+    "Travel is one-way and dates remain flexible within a narrow booking window.",
+    "Transfer ratio is 1.0 with no live bonus applied.",
+    "No elite benefits, companion certificates, or status upgrades are included.",
+    "Taxes and fees are checked at booking time, not estimated from archived pricing."
+  ],
+  "evidence": [
+    {
+      "type": "official",
+      "label": "Program transfer partner guide",
+      "source": "Issuer transfer page",
+      "url": "https://example.com/official-transfer-guide"
+    },
+    {
+      "type": "official",
+      "label": "Partner award booking reference",
+      "source": "Partner award page",
+      "url": "https://example.com/award-booking-reference"
+    },
+    {
+      "type": "community",
+      "label": "Recent traveler booking datapoint",
+      "source": "Community reference thread",
+      "url": "https://example.com/community-booking-datapoint"
+    }
+  ],
+  "next_action": {
+    "immediate_step": "Check live partner availability and total taxes, then execute the transfer only if both remain favorable.",
+    "watch_item": "Monitor same-day award inventory and cash fare movement before locking the final booking.",
+    "client_decision_gate": "Choose between higher potential value and lower execution risk."
+  }
+}
