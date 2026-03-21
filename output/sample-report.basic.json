@@ -10,7 +10,8 @@
     "tradeoffs": [
       "Award availability may disappear quickly.",
       "Cash fare may still be better if taxes or fees are high."
-    ]
+    ],
+    "fallback_option": "Book cash if award space is unavailable or the final taxes reduce redemption value."
   },
   "fare_points_comparison": {
     "options": [
