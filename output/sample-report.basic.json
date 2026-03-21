@@ -1,7 +1,8 @@
 {
   "executive_summary": {
     "decision_snapshot": "Transfer only if partner award space is available for the target one-way route.",
-    "value_signal": "Points can outperform cash pricing when taxes remain low and transfer timing is controlled."
+    "value_signal": "Points can outperform cash pricing when taxes remain low and transfer timing is controlled.",
+    "priority_watchout": "Award availability can change before transfer and booking are completed."
   },
   "recommendation": {
     "primary_option": "Hold points until partner availability is confirmed, then transfer and book.",
