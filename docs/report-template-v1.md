@@ -58,6 +58,11 @@ Keep the same top-level keys for Basic and Premium.
 Tier differences should appear in detail depth, comparison richness, and evidence density.
 Avoid introducing separate report shapes per tier unless later requirements make that unavoidable.
 
+### Tier Delta Rule
+
+Treat Basic and Premium as one shared output contract.
+Premium should increase depth and decision support detail (including richer evidence), not replace the top-level schema.
+
 ## Evidence Placement
 
 Evidence should appear in the dedicated `evidence` section and may also be referenced inline by other sections when needed. Evidence is placeholder-ready today and can later evolve into richer link-based evidence objects.
