@@ -49,6 +49,7 @@
   ],
   "next_action": {
     "immediate_step": "Check award availability for the exact one-way route before transferring points.",
-    "watch_item": "Re-check taxes, fees, and transfer timing before booking."
+    "watch_item": "Re-check taxes, fees, and transfer timing before booking.",
+    "client_decision_gate": "Choose whether flexibility or immediate booking certainty matters more."
   }
 }
