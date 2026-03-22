@@ -62,6 +62,8 @@ Avoid introducing separate report shapes per tier unless later requirements make
 
 Treat Basic and Premium as one shared output contract.
 Premium should increase depth and decision support detail (including richer evidence), not replace the top-level schema.
+AMP borrows AMC-style output contract discipline to reduce drift, implementation mistakes, and schema divergence.
+AMP should remain shorter and more execution-oriented than AMC, with fewer sections and lighter narrative density.
 
 ## Evidence Placement
 
