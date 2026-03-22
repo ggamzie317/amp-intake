@@ -13,6 +13,9 @@ This template defines the MVP report-level contract for assembler-facing outputs
 5. Evidence
 6. Next Action
 
+Canonical sample output key order for both Basic and Premium:
+`executive_summary` -> `recommendation` -> `fare_points_comparison` -> `assumptions` -> `evidence` -> `next_action`
+
 ## JSON-Style Output Shape
 
 ```json
