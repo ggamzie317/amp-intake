@@ -16,6 +16,11 @@ This template defines the MVP report-level contract for assembler-facing outputs
 Canonical sample output key order for both Basic and Premium:
 `executive_summary` -> `recommendation` -> `fare_points_comparison` -> `assumptions` -> `evidence` -> `next_action`
 
+### Lightweight Type Expectations (Non-Formal)
+
+This is a practical reference for sample outputs, not a formal schema definition.
+`executive_summary`: object, `recommendation`: object, `fare_points_comparison`: object, `assumptions`: array of strings, `evidence`: array of objects, `next_action`: object.
+
 ## JSON-Style Output Shape
 
 ```json
