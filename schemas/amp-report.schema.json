@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://amp.local/schemas/amp-report.schema.json",
+  "title": "AMP Report Output (Thin) v0",
+  "type": "object",
+  "required": [
+    "report_meta",
+    "tier",
+    "section_order",
+    "sections"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "report_meta": {
+      "type": "object",
+      "required": [
+        "report_type",
+        "schema_version",
+        "language"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "report_type": {
+          "type": "string"
+        },
+        "schema_version": {
+          "type": "string"
+        },
+        "language": {
+          "type": "string"
+        },
+        "generated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "tier": {
+      "type": "string",
+      "enum": [
+        "basic",
+        "premium"
+      ]
+    },
+    "section_order": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "uniqueItems": true
+    },
+    "sections": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[a-z][a-z0-9_]*$"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/section"
+      }
+    }
+  },
+  "$defs": {
+    "section": {
+      "type": "object",
+      "required": [
+        "title",
+        "type"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "text",
+            "bullets",
+            "table",
+            "mixed"
+          ]
+        },
+        "summary": {
+          "type": "string"
+        },
+        "bullets": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "table": {
+          "$ref": "#/$defs/table"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "table": {
+      "type": "object",
+      "required": [
+        "columns",
+        "rows"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "columns": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {}
+          }
+        }
+      }
+    }
+  }
+}
